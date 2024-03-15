@@ -85,7 +85,11 @@ public class EmployeeServiceImpl implements EmployeeService{
 
         double yearlySalary = employee.getSalary() * 12;
 
-        taxableIncome = yearlySalary -(employee.getSalary() * monthsWorked / 12);
+        if(currentYear == dojYear){
+            taxableIncome = employee.getSalary() * monthsWorked / 12;
+        }else {
+            taxableIncome = yearlySalary -(employee.getSalary() * monthsWorked / 12);
+        }
 
 
         double tax = 0;
