@@ -50,59 +50,51 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     private EmployeeTaxDetails calculateTaxForCurrentYear(Employee employee) {
         Date doj = employee.getDoj();
-        Date currentDate = new Date();
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentDate);
-        int currentYear = calendar.get(Calendar.YEAR);
-        int currentMonth = calendar.get(Calendar.MONTH);
+        Calendar currentYearStartCalendar = Calendar.getInstance();
+        currentYearStartCalendar.set(Calendar.MONTH, Calendar.APRIL); // April
+        currentYearStartCalendar.set(Calendar.DAY_OF_MONTH, 1); // 1st day of April
+        currentYearStartCalendar.add(Calendar.YEAR, -1); // Go back one year
+        Date curntFinancalyearSartDate = currentYearStartCalendar.getTime();
 
-        double taxableIncome = 0;
         Calendar dojCalendar = Calendar.getInstance();
         dojCalendar.setTime(doj);
         int dojYear = dojCalendar.get(Calendar.YEAR);
-        int dojMonth = dojCalendar.get(Calendar.MONTH);
-
-        if(currentYear-dojYear>=2){
-            dojYear = currentYear-1;
+        int dojMonth = dojCalendar.get(Calendar.MONTH)+1;
+        int dojDay = dojCalendar.get(Calendar.DAY_OF_MONTH);
+        int currentYear = currentYearStartCalendar.get(Calendar.YEAR);
+        
+        int daysWorked = 0;
+        
+        if(doj.before(curntFinancalyearSartDate)){
+            daysWorked = 12*30;
         }
-
-        int monthsWorked;
-        if (dojYear < currentYear || (dojYear == currentYear && dojMonth < Calendar.APRIL)) {
-            // Employee joined before the current financial year starts or joined in the same year before April
-            monthsWorked = (currentYear - dojYear) * 12; // Total months in the complete years
-            if (dojYear == currentYear) {
-                // If the employee joined in the same year, add months from January to March
-                monthsWorked += currentMonth - dojMonth;
-            } else {
-                // If the employee joined before the current year, add months from April to December
-                monthsWorked += (Calendar.DECEMBER - Calendar.APRIL + 1);
+        if(doj.after(curntFinancalyearSartDate) && dojYear<currentYear){
+            daysWorked = (13-dojMonth +3)*30;
+            if(dojDay>1){
+                daysWorked = daysWorked - (30-(dojDay+1));
             }
-        } else {
-            // Employee joined in the current financial year after April
-            monthsWorked = currentMonth - Calendar.APRIL + 1;
+        }
+        if(doj.after(curntFinancalyearSartDate) && dojYear==currentYear){
+            daysWorked = (4-dojMonth)*30;
+            if(dojDay>1){
+                daysWorked = daysWorked - (30-(dojDay+1));
+            }
         }
 
-        double yearlySalary = employee.getSalary() * 12;
-
-        if(currentYear == dojYear){
-            taxableIncome = employee.getSalary() * monthsWorked / 12;
-        }else {
-            taxableIncome = yearlySalary -(employee.getSalary() * monthsWorked / 12);
-        }
-
+        Double taxableIncome= employee.getSalary()/30 *daysWorked;
 
         double tax = 0;
-        if (taxableIncome > 1000000) {
-            tax += (taxableIncome - 1000000) * 0.2;
-            taxableIncome = 1000000;
+        if (taxableIncome > 1000000.0) {
+            tax += (taxableIncome - 1000000.0) * 0.2;
+            taxableIncome = 1000000.0;
         }
-        if (taxableIncome > 500000) {
-            tax += (taxableIncome - 500000) * 0.1;
-            taxableIncome = 500000;
+        if (taxableIncome > 500000.0) {
+            tax += (taxableIncome - 500000.0) * 0.1;
+            taxableIncome = 500000.0;
         }
-        if (taxableIncome > 250000) {
-            tax += (taxableIncome - 250000) * 0.05;
+        if (taxableIncome > 250000.0) {
+            tax += (taxableIncome - 250000.0) * 0.05;
         }
 
         EmployeeTaxDetails taxDetails = getTaxDetails(employee, tax);
@@ -113,10 +105,11 @@ public class EmployeeServiceImpl implements EmployeeService{
     private static EmployeeTaxDetails getTaxDetails(Employee employee, double tax) {
         double cess = 0;
         //Collect additional 2% cess for the amount more than 2500000 (ex: yearly salary is 2800000 then collect 2% cess for 300000)
-        if (employee.getSalary() > 2500000) {
-            cess = 0.02 * (employee.getSalary() - 2500000);
-        }
+
         double yearlySalary = employee.getSalary() * 12;
+        if (yearlySalary > 2500000) {
+            cess = 0.02 * (yearlySalary - 2500000);
+        }
 
         EmployeeTaxDetails taxDetails = new EmployeeTaxDetails();
         taxDetails.setEmployeeCode(String.valueOf(employee.getEmployeeId()));
