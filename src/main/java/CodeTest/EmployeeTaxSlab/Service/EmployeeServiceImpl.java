@@ -81,8 +81,9 @@ public class EmployeeServiceImpl implements EmployeeService{
                 daysWorked = daysWorked - (30-(dojDay+1));
             }
         }
+        Double yearSalary=employee.getSalary()/30 *daysWorked;
 
-        Double taxableIncome= employee.getSalary()/30 *daysWorked;
+        Double taxableIncome =  yearSalary;
 
         double tax = 0;
         if (taxableIncome > 1000000.0) {
@@ -97,16 +98,14 @@ public class EmployeeServiceImpl implements EmployeeService{
             tax += (taxableIncome - 250000.0) * 0.05;
         }
 
-        EmployeeTaxDetails taxDetails = getTaxDetails(employee, tax);
+        EmployeeTaxDetails taxDetails = getTaxDetails(employee, tax, yearSalary);
 
         return taxDetails;
     }
 
-    private static EmployeeTaxDetails getTaxDetails(Employee employee, double tax) {
+    private static EmployeeTaxDetails getTaxDetails(Employee employee, double tax , Double yearlySalary) {
         double cess = 0;
         //Collect additional 2% cess for the amount more than 2500000 (ex: yearly salary is 2800000 then collect 2% cess for 300000)
-
-        double yearlySalary = employee.getSalary() * 12;
         if (yearlySalary > 2500000) {
             cess = 0.02 * (yearlySalary - 2500000);
         }
