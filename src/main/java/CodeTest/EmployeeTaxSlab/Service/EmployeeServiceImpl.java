@@ -52,6 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService{
         Date doj = employee.getDoj();
 
         Calendar currentYearStartCalendar = Calendar.getInstance();
+        int currentYear = currentYearStartCalendar.get(Calendar.YEAR);
         currentYearStartCalendar.set(Calendar.MONTH, Calendar.APRIL); // April
         currentYearStartCalendar.set(Calendar.DAY_OF_MONTH, 1); // 1st day of April
         currentYearStartCalendar.add(Calendar.YEAR, -1); // Go back one year
@@ -62,7 +63,7 @@ public class EmployeeServiceImpl implements EmployeeService{
         int dojYear = dojCalendar.get(Calendar.YEAR);
         int dojMonth = dojCalendar.get(Calendar.MONTH)+1;
         int dojDay = dojCalendar.get(Calendar.DAY_OF_MONTH);
-        int currentYear = currentYearStartCalendar.get(Calendar.YEAR);
+
         
         int daysWorked = 0;
         
