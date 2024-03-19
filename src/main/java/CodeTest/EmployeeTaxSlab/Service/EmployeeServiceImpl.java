@@ -3,16 +3,14 @@ package CodeTest.EmployeeTaxSlab.Service;
 import CodeTest.EmployeeTaxSlab.DTO.EmployeeDto;
 import CodeTest.EmployeeTaxSlab.DTO.EmployeeTaxDetails;
 import CodeTest.EmployeeTaxSlab.Entity.Employee;
+import CodeTest.EmployeeTaxSlab.Exception.BadRequestException;
 import CodeTest.EmployeeTaxSlab.Repository.EmployeeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
@@ -33,6 +31,16 @@ public class EmployeeServiceImpl implements EmployeeService{
     @Override
     public List<Employee> getAll() {
         return employeeRepository.findAll();
+    }
+
+    @Override
+    public Employee getById(int id) throws BadRequestException {
+        Optional<Employee> byId = employeeRepository.findById(id);
+        if(byId.isPresent()){
+            return byId.get();
+        }else {
+            throw new BadRequestException("Id not found");
+        }
     }
 
 

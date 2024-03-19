@@ -8,6 +8,7 @@ public class EmployeeTaxSlabApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(EmployeeTaxSlabApplication.class, args);
+
 	}
 
 }
